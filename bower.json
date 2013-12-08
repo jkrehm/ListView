@@ -1,0 +1,24 @@
+{
+  "name": "ListView",
+  "version": "0.1.0",
+  "authors": [
+    "Jonathan Rehm <jkrehm@gmail.com>"
+  ],
+  "description": "ListView component",
+  "main": "listview.js",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "hammerjs": "~1.0.5",
+    "requirejs": "~2.1.9",
+    "jquery-hammerjs": "*",
+    "lodash": "~2.4.1"
+  }
+}

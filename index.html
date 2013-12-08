@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ListView</title>
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script type="text/javascript" src="bower_components/requirejs/require.js" data-main="require-init.js"></script>
+</head>
+<body>
+    <ul>
+        <li>Test 1</li>
+        <li>Test 2</li>
+    </ul>
+    <script type="text/javascript">
+        require(['listview'], function(ListView) {
+
+            var list = new ListView({
+                selector : 'ul li',
+                left     : [
+                    {
+                        action   : function() {
+                            console.log('left');
+                        },
+                        class    : 'red',
+                        distance : [10],
+                    }
+                ],
+                right    : [
+                    {
+                        action   : function() {
+                            console.log('right');
+                        },
+                        class    : 'green',
+                        distance : [10, 160],
+                    },
+                    {
+                        action   : function() {
+                            console.log('right more');
+                        },
+                        class    : 'blue',
+                        distance : [161, 310],
+                    },
+                    {
+                        action   : function() {
+                            console.log('right most');
+                        },
+                        class    : 'red',
+                        distance : [311],
+                    },
+                ],
+            });
+        });
+    </script>
+</body>
+</html>
