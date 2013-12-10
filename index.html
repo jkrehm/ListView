@@ -3,7 +3,10 @@
 <head>
     <title>ListView</title>
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="style.css">
+
     <script type="text/javascript" src="bower_components/requirejs/require.js" data-main="require-init.js"></script>
 </head>
 <body>
@@ -12,40 +15,53 @@
         <li>Test 2</li>
     </ul>
     <script type="text/javascript">
+
         require(['listview'], function(ListView) {
 
             var list = new ListView({
-                selector : 'ul li',
+                selector : 'li',
                 left     : [
                     {
-                        action   : function() {
-                            console.log('left');
+                        action   : function(e) {
+                            console.log('archived');
                         },
-                        class    : 'red',
-                        distance : [10],
-                    }
+                        class    : 'right-item blue',
+                        distance : [0, 200],
+                        html     : '<i class="fa fa-archive"></i>Archive',
+                    },
+                    {
+                        action   : function(e) {
+                            console.log('trashed');
+                        },
+                        class    : 'right-item red',
+                        distance : 200,
+                        html     : '<i class="fa fa-trash-o"></i>Trash',
+                    },
                 ],
                 right    : [
                     {
-                        action   : function() {
-                            console.log('right');
+                        action   : function(e) {
+                            console.log('replied');
                         },
-                        class    : 'green',
-                        distance : [10, 160],
+                        class    : 'left-item green',
+                        distance : [0, '15%'],
+                        html     : '<i class="fa fa-reply"></i>Reply',
                     },
                     {
-                        action   : function() {
-                            console.log('right more');
+                        action   : function(e) {
+                            console.log('replied to all');
                         },
-                        class    : 'blue',
-                        distance : [161, 310],
+                        class    : 'left-item blue',
+                        distance : ['15%', '30%'],
+                        html     : '<i class="fa fa-reply-all"></i>Reply all',
                     },
                     {
-                        action   : function() {
-                            console.log('right most');
+                        action   : function(e) {
+                            console.log('forwarded');
                         },
-                        class    : 'red',
-                        distance : [311],
+                        class    : 'left-item red',
+                        distance : ['30%'],
+                        html     : '<i class="fa fa-share"></i>Forward',
                     },
                 ],
             });

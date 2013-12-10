@@ -1,19 +1,40 @@
+* {
+    Box-sizing: Border-box
+}
 ul {
     list-style-type: none;
-    margin: 0;
+    margin: 0 auto;
+    max-width: 50%;
     padding: 0;
     position: relative;
 }
 li {
     background-color: white;
     border: 1px solid black;
-    border-bottom: none;
     padding: 20px 15px;
 }
-li:last-child {
-    border-bottom: 1px solid black;
-}
 
+.left-item,
+.right-item {
+    color: white;
+    padding: 20px 55px;
+}
+.right-item {
+    text-align: right;
+}
+.left-item i,
+.right-item i {
+    font-size: 24px;
+    margin-top: -12px;
+    position: absolute;
+    top: 50%;
+}
+.left-item i {
+    left: 24px;
+}
+.right-item i {
+    right: 24px;
+}
 .green {
     background-color: green;
 }
