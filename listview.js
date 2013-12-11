@@ -85,7 +85,9 @@ define(['jquery', 'hammer', 'hammer-jquery'], function($, Hammer) {
 
         // Instantiate Hammer on the specified selector
         $(this.selector).hammer({
-            drag_min_distance : 2,
+            drag_min_distance     : 2,
+            drag_block_horizontal : true,
+            drag_lock_to_axis     : true,
         })
 
         .on('dragstart', $.proxy(function(e) {
@@ -93,33 +95,19 @@ define(['jquery', 'hammer', 'hammer-jquery'], function($, Hammer) {
             this.left  = BuildActions(this.left, e);
             this.right = BuildActions(this.right, e);
 
-            direction = e.gesture.direction;
-
         }, this))
 
         .on('drag', $.proxy(function(e) {
-
-            e.gesture.preventDefault();
 
             // Move the target
             $(e.target).css({
                 transform : 'translate3d(' + e.gesture.deltaX + 'px, 0, 0)'
             });
 
-            // Ignore drags that are not to the left or right
-            if ([Hammer.DIRECTION_LEFT, Hammer.DIRECTION_RIGHT].indexOf(e.gesture.direction) === -1) {
-                return false;
-            }
-
-            // User changed direction, so recalculate the breaks
-            if (direction !== e.gesture.direction) {
-                direction = e.gesture.direction;
-            }
-
             var distance = Math.abs(e.gesture.distance);
 
             // Determine which actions should be performed
-            this[direction].forEach(function(el, index) {
+            this[e.gesture.direction].forEach(function(el, index) {
 
                 if (distance >= el.distance[0] && (typeof el.distance[1] == 'undefined' || distance < el.distance[1])) {
 
@@ -132,9 +120,9 @@ define(['jquery', 'hammer', 'hammer-jquery'], function($, Hammer) {
         }, this))
 
         // Reset elements on release
-        .on('release', $.proxy(function(e) {
+        .on('dragend', $.proxy(function(e) {
 
-            var current;
+            var currentIndex;
 
             $(e.target).css({
                 transform : 'translate3d(0, 0, 0)'
@@ -144,16 +132,16 @@ define(['jquery', 'hammer', 'hammer-jquery'], function($, Hammer) {
             var distance = Math.abs(e.gesture.distance);
 
             // Determine which actions should be performed
-            this[direction].forEach(function(el, index) {
+            this[e.gesture.direction].forEach(function(el, index) {
 
                 if (distance >= el.distance[0] + 20 && (typeof el.distance[1] == 'undefined' || distance < el.distance[1])) {
-                    current = index;
+                    currentIndex = index;
                 }
 
             }, this);
 
-            if (typeof current != 'undefined') {
-                this[direction][current].action(e);
+            if (typeof currentIndex != 'undefined') {
+                this[e.gesture.direction][currentIndex].action(e);
             }
 
         }, this));
