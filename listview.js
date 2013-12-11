@@ -14,7 +14,7 @@ define(['jquery', 'hammer', 'hammer-jquery'], function($, Hammer) {
         };
     }
 
-    function PercentToPx(breaks, elWidth) {
+    function BuildActions(breaks, e) {
 
         breaks.forEach(function(el, index) {
     
@@ -22,14 +22,32 @@ define(['jquery', 'hammer', 'hammer-jquery'], function($, Hammer) {
                 el.distance = [el.distance];
             }
 
+            // Convert any percentages to pixels
             el.distance.forEach(function(startEnd, idx) {
 
                 if (typeof startEnd === 'string' && 
                     startEnd.indexOf('%')
                 ) {
-                    breaks[index].distance[idx] = elWidth * startEnd.replace('%', '') / 100;
+                    breaks[index].distance[idx] = e.target.offsetWidth * startEnd.replace('%', '') / 100;
                 }
             });
+
+            // Render subitem
+            breaks[index].subitem = $('<div/>', {
+                'data-role' : 'subitem',
+            })
+            .css({
+                height     : e.target.offsetHeight,
+                left       : e.target.offsetLeft,
+                position   : 'absolute',
+                top        : e.target.offsetTop,
+                width      : e.target.offsetWidth,
+                'z-index'  : e.target.style.zIndex - 1,
+            })
+            .appendTo( $(e.target).parent() )
+            .html(el.html)
+            .addClass(el.class)
+            .hide();
         });
 
         return breaks;
@@ -37,7 +55,7 @@ define(['jquery', 'hammer', 'hammer-jquery'], function($, Hammer) {
 
     function ListView(options) {
 
-        options = $.extend({
+        var defaults = {
             selector : '',
             left     : [{
                 action   : function() {},
@@ -55,35 +73,28 @@ define(['jquery', 'hammer', 'hammer-jquery'], function($, Hammer) {
                 action   : function() {},
                 class    : '',
             },
-        }, options);
+        };
+
+        options = $.extend({}, defaults, options);
 
         this.selector  = options.selector;
         this.left      = options.left;
         this.right     = options.right;
 
-        var dragged   = false;
         var breaks, subitem, direction;
 
+        // Instantiate Hammer on the specified selector
         $(this.selector).hammer({
             drag_min_distance : 2,
         })
 
         .on('dragstart', $.proxy(function(e) {
-        
+
+            this.left  = BuildActions(this.left, e);
+            this.right = BuildActions(this.right, e);
+
             direction = e.gesture.direction;
 
-            subitem = $('<div/>', {
-                'data-role' : 'subitem',
-            }).css({
-                height   : e.target.offsetHeight,
-                left     : e.target.offsetLeft,
-                position : 'absolute',
-                top      : e.target.offsetTop,
-                width    : e.target.offsetWidth,
-                'z-index' : e.target.style.zIndex - 1,
-            }).appendTo( $(e.target).parent() );
-
-            breaks = PercentToPx(this[direction], e.target.offsetWidth);
         }, this))
 
         .on('drag', $.proxy(function(e) {
@@ -103,26 +114,21 @@ define(['jquery', 'hammer', 'hammer-jquery'], function($, Hammer) {
             // User changed direction, so recalculate the breaks
             if (direction !== e.gesture.direction) {
                 direction = e.gesture.direction;
-                breaks = PercentToPx(this[direction], e.target.offsetWidth);
             }
-
-            // Move the target
-            $(e.target).css({
-                transform : 'translate3d(' + e.gesture.deltaX + 'px, 0, 0)'
-            });
 
             var distance = Math.abs(e.gesture.distance);
 
             // Determine which actions should be performed
-            breaks.forEach(function(el, index) {
+            this[direction].forEach(function(el, index) {
 
                 if (distance >= el.distance[0] && (typeof el.distance[1] == 'undefined' || distance < el.distance[1])) {
 
-                    subitem.html(el.html);
-                    subitem.removeClass().addClass(el.class);
+                    $('[data-role="subitem"]:visible').hide();
+                    el.subitem.show();
                 }
 
             }, this);
+
         }, this))
 
         // Reset elements on release
@@ -138,7 +144,7 @@ define(['jquery', 'hammer', 'hammer-jquery'], function($, Hammer) {
             var distance = Math.abs(e.gesture.distance);
 
             // Determine which actions should be performed
-            breaks.forEach(function(el, index) {
+            this[direction].forEach(function(el, index) {
 
                 if (distance >= el.distance[0] + 20 && (typeof el.distance[1] == 'undefined' || distance < el.distance[1])) {
                     current = index;
@@ -147,7 +153,7 @@ define(['jquery', 'hammer', 'hammer-jquery'], function($, Hammer) {
             }, this);
 
             if (typeof current != 'undefined') {
-                breaks[current].action(e);
+                this[direction][current].action(e);
             }
 
         }, this));
